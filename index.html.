@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leitor de ingressos</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #leitor {
+      max-width: 400px;
+      margin: 20px auto;
+    }
+    #resultado {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Validação de ingressos</h2>
+  <p>Toque no botão e autorize a câmera.</p>
+  <button id="iniciar">Abrir câmera</button>
+  <div id="leitor"></div>
+  <p id="resultado">Leitor aguardando.</p>
 
+  <script>
+    let leitor;
+
+    document.getElementById("iniciar").onclick = async function () {
+      const resultado = document.getElementById("resultado");
+      resultado.textContent = "Abrindo câmera...";
+
+      try {
+        if (typeof Html5Qrcode === "undefined") {
+          throw new Error("A biblioteca do leitor não carregou.");
+        }
+
+        leitor = new Html5Qrcode("leitor");
+
+        await leitor.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 230, height: 230 } },
+          function (texto) {
+            resultado.textContent = "QR Code lido: " + texto;
+            leitor.pause(true);
+          }
+        );
+
+        resultado.textContent = "Câmera aberta. Aponte para o QR Code.";
+      } catch (erro) {
+        resultado.textContent =
+          "Não foi possível abrir a câmera: " +
+          (erro.message || String(erro));
+      }
+    };
+  </script>
+</body>
+</html>
